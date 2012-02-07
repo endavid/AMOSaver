@@ -1,0 +1,4 @@
+Manifest-Version: 1.0
+Created-By: David Gavilan
+Main-Class: app.AMOSFileDecoder
+

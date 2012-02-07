@@ -1,0 +1,74 @@
+<!-- To build this use 'ant' -->
+<project name="AMOSaver" default="jar" basedir=".">
+  <!-- set global properties for this build -->
+  <property name="name" value="${ant.project.name}"/>
+  <property name="src" value="src"/>
+  <property name="build" value="build"/>
+  <property name="dist"  value="dist"/>  
+  <property name="mainclass" value="app.AMOSFileDecoder"/>
+  <!-- java -Duser.language=en myClass -->
+  <property name="user.language" value="en"/>
+
+
+  
+  <target name="init">
+    <!-- Create the time stamp -->
+    <tstamp/>
+    <!-- Create the build directory structure used by compile -->
+    <mkdir dir="${build}"/>
+    
+    <!-- Create the MANIFEST -->
+    <echo file="${src}/MANIFEST.MF">Manifest-Version: 1.0
+Created-By: David Gavilan
+Main-Class: ${mainclass}
+
+</echo>
+    
+  </target>
+  
+  <target name="compile" depends="init">
+    <!-- Compile the java code from ${src} into ${build} with debugging info. classpath="${extraLibs}" -->
+    <javac srcdir="${src}" destdir="${build}" debug="yes" deprecation="yes" includeantruntime="false"/>
+  </target>
+
+  <target name="jar" depends="compile">
+    <!-- Create the distribution directory -->
+    <mkdir dir="${dist}"/>
+
+    <!-- Put everything in ${build} into the MyProject-${DSTAMP}.jar file -->
+    <jar jarfile="${dist}/${name}.jar" basedir="${build}"
+         manifest="${src}/MANIFEST.MF">
+        <zipfileset dir="resources" prefix="resources"/>
+        <!--<zipfileset dir="docs/help" prefix="doc"/>
+        -->
+    </jar>
+  </target>
+
+
+  <target name="dist" depends="jar">
+  <!--<target name="dist">-->
+
+    <tar tarfile="${dist}/${name}-${DSTAMP}.tar" basedir="."
+    	 excludes="${dist}/**,${build}/**,docs/api/**"/>
+    <gzip zipfile="${dist}/${name}-${DSTAMP}.tar.gz" src="${dist}/${name}-${DSTAMP}.tar"/>
+    <delete file="${dist}/${name}-${DSTAMP}.tar"/>
+  </target>
+
+  <target name="clean">
+    <!-- Delete the ${build} and ${dist} directory trees -->
+    <delete dir="${build}"/>
+    <delete dir="${dist}"/>
+  </target>
+  
+  <target name="doc">
+    <mkdir dir="docs"/>
+    <mkdir dir="docs/api"/>
+    
+    <javadoc locale="en_US" packagenames="app.*" excludepackagenames="com.*"
+             sourcepath="src" destdir="docs/api" private="yes">
+	<doctitle><![CDATA[<h1>${name} API</h1>]]></doctitle>	     
+    </javadoc>	     	     
+  </target>
+
+</project>
+
