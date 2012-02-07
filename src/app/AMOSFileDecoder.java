@@ -17,6 +17,8 @@ public class AMOSFileDecoder {
                 System.err.println( "" + exc );
             } catch (amos.io.UnsupportedFormat exc) {
                 System.err.println( "" + exc );
+            } catch (java.io.IOException exc) {
+                System.err.println( "" + exc );
             }
         }
     }

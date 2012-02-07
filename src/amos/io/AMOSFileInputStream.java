@@ -56,6 +56,31 @@ public class AMOSFileInputStream
 
         System.out.println("ntokens: "+m_numBASICTokens);
 
+        System.out.println( readLine() );
+    }
+    
+    /**
+     * Reads tokens from a line of AMOS BASIC code
+     */
+    public String readLine() throws java.io.IOException
+    {
+        String line = "";
+        byte[] ubyte = new byte[1];
+        m_stream.read(ubyte);
+        int lineLength = 0xff & (int)ubyte[0] ;
+        
+        m_stream.read(ubyte);
+        int indentLevel = 0xff & (int)ubyte[0] ;
+        for (int i=1; i<indentLevel; ++i) line = line + " ";
+        
+        byte[] uword = new byte[2];
+        for (int i=1; i<lineLength; ++i) {
+            m_stream.read(uword);
+        }
+
+        System.out.println("line l: "+lineLength+" indent: "+indentLevel);
+
+        return line;
     }
     
     public boolean isValidHeader(String header)
