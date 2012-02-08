@@ -13,9 +13,15 @@ public class AMOSFileDecoder {
                 File file = new File( args[0] );
                 AMOSFileInputStream fileDecoder = new AMOSFileInputStream(file);
                 
+                while (!fileDecoder.isSourceCodeEnd()) {
+                    System.out.println( fileDecoder.readLine() );
+                }
+                
             } catch (java.io.FileNotFoundException exc) {
                 System.err.println( "" + exc );
             } catch (amos.io.UnsupportedFormat exc) {
+                System.err.println( "" + exc );
+            } catch (java.io.StreamCorruptedException exc) {
                 System.err.println( "" + exc );
             } catch (java.io.IOException exc) {
                 System.err.println( "" + exc );

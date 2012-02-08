@@ -123,7 +123,7 @@
 		<string>IDEActiveWorkspaceTabController</string>
 		<string>IDEWindowToolbarIsVisible</string>
 		<string>IDEWindowTabBarIsVisible</string>
-		<string>{{100, 1}, {960, 777}}</string>
+		<string>{{248, 1}, {960, 777}}</string>
 		<dict>
 			<key>$class</key>
 			<dict>
@@ -1249,10 +1249,10 @@
 		<string>PrimaryDocumentVisibleCharacterRange</string>
 		<string>HideAllIssues</string>
 		<string>PrimaryDocumentSelectedCharacterRange</string>
-		<real>350323289.17096299</real>
-		<string>{1756, 1696}</string>
+		<real>350409134.84580398</real>
+		<string>{10124, 2176}</string>
 		<false/>
-		<string>{2603, 0}</string>
+		<string>{11572, 0}</string>
 		<string>readLine()</string>
 		<string>AMOSFileInputStream.java</string>
 		<string>Xcode.IDEKit.EditorDocument.SourceCode</string>
@@ -2885,9 +2885,9 @@
 				</dict>
 			</array>
 		</dict>
-		<real>350318795.23805797</real>
-		<string>{0, 748}</string>
-		<string>{716, 0}</string>
+		<real>350403944.32661098</real>
+		<string>{0, 1015}</string>
+		<string>{839, 0}</string>
 		<dict>
 			<key>$class</key>
 			<dict>
@@ -2933,9 +2933,9 @@
 				</dict>
 			</array>
 		</dict>
-		<real>350323289.16911101</real>
-		<string>{1756, 1696}</string>
-		<string>{2603, 0}</string>
+		<real>350409134.844778</real>
+		<string>{10124, 2176}</string>
+		<string>{11572, 0}</string>
 		<dict>
 			<key>$class</key>
 			<dict>
