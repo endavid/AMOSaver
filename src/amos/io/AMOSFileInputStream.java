@@ -194,6 +194,48 @@ public class AMOSFileInputStream
                     line = line + "\'"+(new String(str))+"\'" ;
                     break;
                 }
+                case 0x001E: // Binary integer value
+                {
+                    m_stream.read(m_tmp4B); // integer 
+                    int value = readSignedInt(m_tmp4B);
+                    readWords += 2;
+                    line = line + "%"+Integer.toBinaryString(value) ;
+                    break;
+                }
+                case 0x0036: // Hexadecimal integer value
+                {
+                    m_stream.read(m_tmp4B); // integer 
+                    int value = readSignedInt(m_tmp4B);
+                    readWords += 2;
+                    line = line + "$"+Integer.toHexString(value) ;
+                    break;
+                }
+                case 0x003E: // Decimal integer value
+                {
+                    m_stream.read(m_tmp4B); // integer 
+                    int value = readSignedInt(m_tmp4B);
+                    readWords += 2;
+                    line = line +Integer.toString(value) ;
+                    break;
+                }
+                case 0x0046: // Float value
+                {
+                    m_stream.read(m_tmp4B); // float 
+                    float value = readFloat(m_tmp4B);
+                    readWords += 2;
+                    line = line + Float.toString(value) ;
+                    break;
+                }
+                case 0x004E: // Extension command
+                {
+                    m_stream.read(m_tmp1B); // integer 
+                    int extNumber = readUnsignedByte(m_tmp1B);
+                    m_stream.read(m_tmp1B); // unused
+                    m_stream.read(m_tmp2B); // signed 16-bit offset into extension's token table
+                    readWords += 2;
+                    line = line +"[ext"+extNumber+"] " ;
+                    break;
+                }                    
                 // Specially sized tokens
                 // -------------------------------------------
                 case 0x023C: // FOR
@@ -319,7 +361,23 @@ public class AMOSFileInputStream
         }
         return false ;
     }
-    
+
+    public static float readFloat(byte[] bigEndian)
+    {
+        int value = ((0x000000ff & (int)bigEndian[0]) << 24) |
+            ((0x000000ff & (int)bigEndian[1]) << 16) |
+            ((0x000000ff & (int)bigEndian[2]) <<  8) |
+            ((0x000000ff & (int)bigEndian[3]) ) ;
+        return Float.intBitsToFloat(value) ;
+    }
+    public static int readSignedInt(byte[] bigEndianSigned)
+    {
+        int value = ((0x000000ff & (int)bigEndianSigned[0]) << 24) |
+                    ((0x000000ff & (int)bigEndianSigned[1]) << 16) |
+                    ((0x000000ff & (int)bigEndianSigned[2]) <<  8) |
+                    ((0x000000ff & (int)bigEndianSigned[3]) ) ;
+        return value ;
+    }
     public static long readUnsignedInt(byte[] bigEndianUnsigned)
     {
         long value = 0xFFFFFFFFL & (long)(

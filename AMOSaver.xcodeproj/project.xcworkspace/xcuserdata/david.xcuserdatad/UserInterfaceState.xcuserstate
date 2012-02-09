@@ -1249,11 +1249,11 @@
 		<string>PrimaryDocumentVisibleCharacterRange</string>
 		<string>HideAllIssues</string>
 		<string>PrimaryDocumentSelectedCharacterRange</string>
-		<real>350409134.84580398</real>
-		<string>{10124, 2176}</string>
+		<real>350493987.47216302</real>
+		<string>{13751, 1894}</string>
 		<false/>
-		<string>{11572, 0}</string>
-		<string>readLine()</string>
+		<string>{14563, 0}</string>
+		<string>class AMOSFileInputStream</string>
 		<string>AMOSFileInputStream.java</string>
 		<string>Xcode.IDEKit.EditorDocument.SourceCode</string>
 		<dict>
@@ -2933,9 +2933,9 @@
 				</dict>
 			</array>
 		</dict>
-		<real>350409134.844778</real>
-		<string>{10124, 2176}</string>
-		<string>{11572, 0}</string>
+		<real>350493987.47038001</real>
+		<string>{13751, 1894}</string>
+		<string>{14563, 0}</string>
 		<dict>
 			<key>$class</key>
 			<dict>
