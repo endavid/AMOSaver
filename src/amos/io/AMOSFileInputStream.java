@@ -3,6 +3,8 @@ package amos.io ;
 import java.io.File ;
 import java.io.FileInputStream ;
 import java.io.FileNotFoundException ;
+import java.util.Map;
+import java.util.HashMap;
 
 /**
  * @see http://www.exotica.org.uk/wiki/AMOS_file_formats
@@ -29,6 +31,7 @@ public class AMOSFileInputStream
     byte[]  m_tmp4B = {0,0,0,0};
     byte[]  m_tmp2B = {0,0};
     byte[]  m_tmp1B = {0};
+    Map<Integer,String> m_tokenMap;
     
     public boolean isSanityTested()
     {
@@ -58,6 +61,8 @@ public class AMOSFileInputStream
         m_sourceSizeBytes = readUnsignedInt(m_tmp4B);
         m_readBytes = 0;
 
+        m_tokenMap = new HashMap<Integer,String>();
+        _initTokenMap();
         //System.out.println("source size: "+m_sourceSizeBytes);
     }
     
@@ -233,7 +238,12 @@ public class AMOSFileInputStream
                     m_stream.read(m_tmp1B); // unused
                     m_stream.read(m_tmp2B); // signed 16-bit offset into extension's token table
                     readWords += 2;
-                    line = line +"[ext"+extNumber+"] " ;
+                    String tokenStr = m_tokenMap.get((extNumber<<16)|tokenID);
+                    if ( tokenStr != null ) {
+                        line = line + tokenStr ;
+                    } else {
+                        line = line +"[ext"+extNumber+"] " ;
+                    }
                     break;
                 }                    
                 // Specially sized tokens
@@ -247,7 +257,7 @@ public class AMOSFileInputStream
                 }
                 case 0x0250: // REPEAT
                 {
-                    line = line + "Repeat ";
+                    line = line + "Repeat";
                     m_stream.read(m_tmp2B); // unknown purpose
                     readWords += 1;
                     break;
@@ -321,7 +331,7 @@ public class AMOSFileInputStream
                 case 0x064A: // REM
                 case 0x0652: // REM type 2
                 {
-                    line = line + "REM ";
+                    line = line + m_tokenMap.get(tokenID);
                     m_stream.read(m_tmp1B); // unused 
                     m_stream.read(m_tmp1B); // string size 
                     int strlength = readUnsignedByte(m_tmp1B);
@@ -333,7 +343,14 @@ public class AMOSFileInputStream
                     break;
                 }
                 default:
-                    line = line + (" 0x" + Integer.toHexString(tokenID));                    
+                {
+                    String tokenStr = m_tokenMap.get(tokenID);
+                    if ( tokenStr != null ) {
+                        line = line + tokenStr ;
+                    } else {
+                        line = line + ("[0x" + Integer.toHexString(tokenID)+"]");                    
+                    }
+                }
             }
         }
         
@@ -399,4 +416,39 @@ public class AMOSFileInputStream
         int value = 0xff & (int)bigEndianUnsigned[0] ;
         return value ;
     }
+    
+    private void _initTokenMap()
+    {
+        m_tokenMap.put(0x0054," : ");
+        m_tokenMap.put(0x005C,",");
+        m_tokenMap.put(0x0074,"("); 
+        m_tokenMap.put(0x007c,")"); 
+        m_tokenMap.put(0x0094," To ");  
+        m_tokenMap.put(0x0246,"Next "); 
+        m_tokenMap.put(0x025c,"Until "); 
+        m_tokenMap.put(0x0390,"End Proc "); 
+        m_tokenMap.put(0x03aa,"Global "); 
+        m_tokenMap.put(0x0426,"Break Off "); 
+        m_tokenMap.put(0x064A,"REM "); // REM
+        m_tokenMap.put(0x0652,"\'"); // REM2
+        m_tokenMap.put(0x0bb8,"Cls "); 
+        m_tokenMap.put(0x0d1c,"Colour "); 
+        m_tokenMap.put(0x0d34,"Flash Off "); 
+        m_tokenMap.put(0x0dfe,"Fade "); 
+        m_tokenMap.put(0x1232,"Fire"); 
+        m_tokenMap.put(0x129e,"Wait "); 
+        m_tokenMap.put(0x13e8,"Centre "); 
+        m_tokenMap.put(0x1446,"Curs Off "); 
+        m_tokenMap.put(0x175A,"Dir$"); 
+        m_tokenMap.put(0x185A,"Load ");
+        m_tokenMap.put(0x1bae,"Get Sprite Palette"); 
+        m_tokenMap.put(0x1de0,"Hide "); 
+        m_tokenMap.put(0xff4c," or "); 
+        m_tokenMap.put(0xffa2,"=");
+        // extensions
+        m_tokenMap.put(0x01004e, "Sam Play ");
+        m_tokenMap.put(0x02004e, "Unpack ");
+        
+    }
+    
 }
