@@ -6,6 +6,7 @@ import java.io.FileNotFoundException ;
 import java.util.Map;
 import java.util.HashMap;
 
+
 /**
  * @see http://www.exotica.org.uk/wiki/AMOS_file_formats
  * @see http://www.amigacoding.com/index.php/AMOS:Picture_Bank_format
@@ -28,6 +29,7 @@ public class AMOSFileInputStream
     boolean m_isSanityTested ;
     long    m_sourceSizeBytes ;
     long    m_readBytes ;
+    int     m_numBanks ;
     byte[]  m_tmp4B = {0,0,0,0};
     byte[]  m_tmp2B = {0,0};
     byte[]  m_tmp1B = {0};
@@ -61,6 +63,7 @@ public class AMOSFileInputStream
         // there's no unsigned int in Java, so store it in a long
         m_sourceSizeBytes = readUnsignedInt(m_tmp4B);
         m_readBytes = 0;
+        m_numBanks = 0;
 
         m_tokenMap = new HashMap<Integer,String>();
         m_extensions = new HashMap<Integer,String>();
@@ -74,6 +77,79 @@ public class AMOSFileInputStream
     public boolean isSourceCodeEnd()
     {
         return ( m_readBytes >= m_sourceSizeBytes );
+    }
+    
+    /**
+     * Checks the number of memory banks, immediately after the source code.
+     */
+    public int readNumBanks() throws java.io.IOException, java.io.StreamCorruptedException
+    {
+        // Check for AmBs string
+        m_stream.read(m_tmp4B);
+        String text = new String(m_tmp4B);
+        if (!text.equals("AmBs")) {
+            throw( new java.io.StreamCorruptedException("File doesn't contain description of memory banks!") ); 
+        }
+        m_stream.read(m_tmp2B);
+        m_numBanks = readUnsignedWord(m_tmp2B);
+        return m_numBanks ;
+    }
+    
+    /**
+     * Checks the type of memory bank to be read
+     */
+    public AMOSBankType readBankType() throws java.io.IOException, java.io.StreamCorruptedException
+    {
+        m_stream.read(m_tmp4B);
+        String text = new String(m_tmp4B);
+        if (text.equals("AmBk")) {
+            return AMOSBankType.MEMORYBANK;
+        } else if (text.equals("AmSp")) {
+            return AMOSBankType.SPRITEBANK;
+        } else if (text.equals("AmIc")) {
+            return AMOSBankType.ICONBANK;
+        }
+        throw( new java.io.StreamCorruptedException("Unknown memory bank!") ); 
+    }
+    
+    /**
+     * Reads Sprites or Icons
+     */
+    public void readImages() throws java.io.IOException, java.io.StreamCorruptedException
+    {
+        m_stream.read(m_tmp2B);
+        int numImages = readUnsignedWord(m_tmp2B);
+        System.out.println("Num images: "+numImages);
+        for (int i=0;i<numImages;++i) {
+            int width = 0, height = 0, depth = 0;
+            int hotspotX = 0, hotspotY = 0;
+            int dataSize = 0;
+            byte[] imageData ;
+            
+            m_stream.read(m_tmp2B);
+            width = readUnsignedWord(m_tmp2B);
+            m_stream.read(m_tmp2B);
+            height = readUnsignedWord(m_tmp2B);
+            m_stream.read(m_tmp2B);
+            depth = readUnsignedWord(m_tmp2B);
+            if (depth<1 || depth>5) {
+                throw( new java.io.StreamCorruptedException("Incompatible image depth("+depth+")!") );
+            }
+            m_stream.read(m_tmp2B);
+            hotspotX = readUnsignedWord(m_tmp2B);
+            m_stream.read(m_tmp2B);
+            hotspotY = readUnsignedWord(m_tmp2B);
+            dataSize = 2 * width * height * depth ;
+            System.out.println("img("+i+")="+width+"x"+height+"x"+depth+", ("+hotspotX+", "+hotspotY+")");
+            if ( dataSize > 0 ) {
+                imageData = new byte[dataSize];
+                m_stream.read(imageData);
+                // now convert planar data... 
+            }
+        }
+        // after all the images comes the color palette
+        byte[] paletteData = new byte[64];
+        m_stream.read(paletteData);
     }
     
     /**

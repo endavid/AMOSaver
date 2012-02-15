@@ -11,6 +11,9 @@
             location = "group:io"
             name = "io">
             <FileRef
+               location = "group:AMOSBankType.java">
+            </FileRef>
+            <FileRef
                location = "group:AMOSFileInputStream.java">
             </FileRef>
             <FileRef
