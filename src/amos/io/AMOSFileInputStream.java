@@ -41,14 +41,17 @@ public class AMOSFileInputStream
     Map<Integer,String> m_tokenMap;
     Map<Integer,String> m_extensions;
     
+    boolean m_isVerbose; 
+    
     public boolean isSanityTested()
     {
         return m_isSanityTested ;
     }
     
-    public AMOSFileInputStream(java.io.File file) 
+    public AMOSFileInputStream(java.io.File file, boolean isVerbose) 
         throws java.io.FileNotFoundException, amos.io.UnsupportedFormat, java.io.IOException
     {
+        m_isVerbose = isVerbose;
         m_stream = new FileInputStream(file);
         String headerString ;
         try {
@@ -125,7 +128,9 @@ public class AMOSFileInputStream
         m_stream.read(m_tmp2B);
         int numImages = readUnsignedWord(m_tmp2B);
         List<BufferedImage> imgList = new ArrayList<BufferedImage>(numImages);
-        System.out.println("Num images: "+numImages);
+        if (m_isVerbose) {
+            System.err.println("... reading "+numImages+" images");
+        }
         for (int i=0;i<numImages;++i) {
             int width = 0, height = 0, depth = 0;
             int hotspotX = 0, hotspotY = 0;
@@ -146,7 +151,9 @@ public class AMOSFileInputStream
             m_stream.read(m_tmp2B);
             hotspotY = readUnsignedWord(m_tmp2B);
             dataSize = 2 * width * height * depth ;
-            System.out.println("img("+i+")="+(16*width)+"x"+height+"x"+depth+", ("+hotspotX+", "+hotspotY+")");
+            if (m_isVerbose) {
+                System.err.println("img("+i+")="+(16*width)+"x"+height+"x"+depth+", ("+hotspotX+", "+hotspotY+")");
+            }
             if ( dataSize > 0 ) {
                 imageData = new byte[dataSize];
                 m_stream.read(imageData);
@@ -191,7 +198,9 @@ public class AMOSFileInputStream
         bankSize = (int)readUnsignedInt(m_tmp4B) - 8;
         m_stream.read(tmp8B);
         bankName = new String(tmp8B);
-        System.err.println(" Bank "+bankNumber+": "+bankName+(isChipMemory?" (chip) ":" ")+bankSize+" bytes");
+        if (m_isVerbose) {
+            System.err.println(" Bank "+bankNumber+": "+bankName+(isChipMemory?" (chip) ":" ")+bankSize+" bytes");
+        }
         if (bankSize > 0) {
             byte[] data = new byte[bankSize];
             m_stream.read(data);

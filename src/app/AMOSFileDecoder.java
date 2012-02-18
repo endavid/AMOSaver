@@ -13,6 +13,7 @@ public class AMOSFileDecoder {
     public static void main(String args[]) {
         // default arguments
         String sourceFile = "";
+        boolean isVerbose = false;
         boolean isSourceOnly = false;
         String imageFolder = "";
         String dataFolder = "";
@@ -21,6 +22,8 @@ public class AMOSFileDecoder {
         while(argIndex < args.length) {
             if (args[argIndex].equals("--sourceonly")) {
                 isSourceOnly = true ;
+            } else if (args[argIndex].equals("--verbose") || args[argIndex].equals("-v")) {
+                isVerbose = true;
             } else if (args[argIndex].equals("--imagefolder")) {
                 if (argIndex+1<args.length) {
                     imageFolder = args[++argIndex];
@@ -43,7 +46,7 @@ public class AMOSFileDecoder {
         } else {
             try {
                 File file = new File( sourceFile );
-                AMOSFileInputStream fileDecoder = new AMOSFileInputStream(file);
+                AMOSFileInputStream fileDecoder = new AMOSFileInputStream(file, isVerbose);
                 
                 // Decode source code
                 while (!fileDecoder.isSourceCodeEnd()) {
@@ -53,7 +56,9 @@ public class AMOSFileDecoder {
                 if (!isSourceOnly) {
                     // Read memory banks
                     int numBanks = fileDecoder.readNumBanks();
-                    System.err.println("Decoding "+numBanks+" banks...");
+                    if (isVerbose) {
+                        System.err.println("Decoding "+numBanks+" banks...");
+                    }
                     
                     // process banks
                     for(int i=0;i<numBanks;i++) {
@@ -87,7 +92,6 @@ public class AMOSFileDecoder {
                             }
                             case MEMORYBANK:
                             {
-                                System.out.println("MemoryBank");
                                 fileDecoder.readMemoryBank();
                                 break;
                             }
@@ -113,6 +117,7 @@ public class AMOSFileDecoder {
     public static void printHelp() {
         System.out.println( "Usage: AMOSFileDecoder [options] AMOS_SOURCE_FILE" );
         System.out.println( "Options:" );
+        System.out.println( "  -v | --verbose: outputs more information" );        
         System.out.println( "  --sourceonly: decode only the source code");
         System.out.println( "  --imagefolder PATH: output images to PATH");
         System.out.println( "  --datafolder PATH: output memory banks to PATH");

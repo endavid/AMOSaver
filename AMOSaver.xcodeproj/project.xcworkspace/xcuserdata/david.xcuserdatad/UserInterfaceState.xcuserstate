@@ -1044,9 +1044,9 @@
 		<string>PrimaryDocumentVisibleCharacterRange</string>
 		<string>HideAllIssues</string>
 		<string>PrimaryDocumentSelectedCharacterRange</string>
-		<real>351244785.47674698</real>
-		<string>{6076, 1797}</string>
-		<string>{7043, 0}</string>
+		<real>351272683.54832101</real>
+		<string>{8450, 2685}</string>
+		<string>{7269, 0}</string>
 		<string>readMemoryBank()</string>
 		<string>AMOSFileInputStream.java</string>
 		<string>Xcode.IDEKit.EditorDocument.SourceCode</string>
@@ -3066,9 +3066,9 @@
 				</dict>
 			</array>
 		</dict>
-		<real>351243998.266433</real>
-		<string>{1525, 2613}</string>
-		<string>{3927, 0}</string>
+		<real>351272569.49515998</real>
+		<string>{308, 2052}</string>
+		<string>{791, 0}</string>
 		<dict>
 			<key>$class</key>
 			<dict>
@@ -3114,9 +3114,9 @@
 				</dict>
 			</array>
 		</dict>
-		<real>351244785.47582197</real>
-		<string>{6076, 1797}</string>
-		<string>{7043, 0}</string>
+		<real>351272683.54672301</real>
+		<string>{8450, 2685}</string>
+		<string>{7269, 0}</string>
 		<dict>
 			<key>$class</key>
 			<dict>
