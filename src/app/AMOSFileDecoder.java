@@ -11,11 +11,38 @@ import amos.io.* ;
 public class AMOSFileDecoder {
 
     public static void main(String args[]) {
-        if (args.length == 0) {
-            System.out.println( "Usage: AMOSFileDecoder FILE" );
+        // default arguments
+        String sourceFile = "";
+        boolean isSourceOnly = false;
+        String imageFolder = "";
+        String dataFolder = "";
+        // parse arguments
+        int argIndex = 0;
+        while(argIndex < args.length) {
+            if (args[argIndex].equals("--sourceonly")) {
+                isSourceOnly = true ;
+            } else if (args[argIndex].equals("--imagefolder")) {
+                if (argIndex+1<args.length) {
+                    imageFolder = args[++argIndex];
+                }
+            } else if (args[argIndex].equals("--datafolder")) {
+                if (argIndex+1<args.length) {
+                    dataFolder = args[++argIndex];
+                }
+            } else if (argIndex!=args.length-1) {
+                // wrong arguments
+                argIndex = args.length-1;
+            } else {
+                sourceFile = args[argIndex];
+            }
+            ++argIndex;
+        }
+        
+        if (sourceFile.isEmpty()) {
+            printHelp();
         } else {
             try {
-                File file = new File( args[0] );
+                File file = new File( sourceFile );
                 AMOSFileInputStream fileDecoder = new AMOSFileInputStream(file);
                 
                 // Decode source code
@@ -23,39 +50,46 @@ public class AMOSFileDecoder {
                     System.out.println( fileDecoder.readLine() );
                 }
                 
-                // Read memory banks
-                int numBanks = fileDecoder.readNumBanks();
-                System.out.println("Num banks: "+numBanks);
-                
-                // process banks
-                for(int i=0;i<numBanks;i++) {
-                    AMOSBankType bankType = fileDecoder.readBankType();
-                    switch(bankType) {
-                        case SPRITEBANK:
-                        {
-                            System.out.println("SpriteBank");
-                            String format = "png";
-
-                            List<BufferedImage> imgList = fileDecoder.readImages();
-                            int count = 0;
-                            for (Iterator<BufferedImage> it = imgList.iterator(); it.hasNext(); ) {
-                                count++;
-                                BufferedImage img = it.next();
-                                File imgfile = new File(String.format("Sprite_%03d.png",count));
-                                ImageIO.write(img, format, imgfile);
+                if (!isSourceOnly) {
+                    // Read memory banks
+                    int numBanks = fileDecoder.readNumBanks();
+                    System.err.println("Decoding "+numBanks+" banks...");
+                    
+                    // process banks
+                    for(int i=0;i<numBanks;i++) {
+                        AMOSBankType bankType = fileDecoder.readBankType();
+                        switch(bankType) {
+                            case SPRITEBANK:
+                            {
+                                String format = "png";                                
+                                List<BufferedImage> imgList = fileDecoder.readImages();
+                                int count = 0;
+                                for (Iterator<BufferedImage> it = imgList.iterator(); it.hasNext(); ) {
+                                    count++;
+                                    BufferedImage img = it.next();
+                                    File imgfile = new File(imageFolder+String.format("Sprite_%03d.png",count));
+                                    ImageIO.write(img, format, imgfile);
+                                }
+                                break;
                             }
-                            break;
-                        }
-                        case ICONBANK:
-                        {
-                            System.out.println("IconBank");
-                            fileDecoder.readImages();
-                            break;
-                        }
-                        case MEMORYBANK:
-                        {
-                            System.out.println("MemoryBank");
-                            break;
+                            case ICONBANK:
+                            {
+                                String format = "png";                                
+                                List<BufferedImage> imgList = fileDecoder.readImages();
+                                int count = 0;
+                                for (Iterator<BufferedImage> it = imgList.iterator(); it.hasNext(); ) {
+                                    count++;
+                                    BufferedImage img = it.next();
+                                    File imgfile = new File(imageFolder+String.format("Icon_%03d.png",count));
+                                    ImageIO.write(img, format, imgfile);
+                                }
+                                break;
+                            }
+                            case MEMORYBANK:
+                            {
+                                System.out.println("MemoryBank");
+                                break;
+                            }
                         }
                     }
                 }
@@ -70,5 +104,16 @@ public class AMOSFileDecoder {
                 System.err.println( "" + exc );
             }
         }
+    } // end main()
+    
+    /**
+     * Prints help
+     */
+    public static void printHelp() {
+        System.out.println( "Usage: AMOSFileDecoder [options] AMOS_SOURCE_FILE" );
+        System.out.println( "Options:" );
+        System.out.println( "  --sourceonly: decode only the source code");
+        System.out.println( "  --imagefolder PATH: output images to PATH");
+        System.out.println( "  --datafolder PATH: output memory banks to PATH");
     }
 }
