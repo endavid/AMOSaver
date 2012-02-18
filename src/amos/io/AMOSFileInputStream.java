@@ -172,6 +172,32 @@ public class AMOSFileInputStream
         return imgList ;
     }
     
+    public void readMemoryBank() throws java.io.IOException, java.io.StreamCorruptedException
+    {
+        int bankNumber = 0;
+        boolean isChipMemory = false;
+        int bankSize = 0;
+        int flags = 0;
+        String bankName = "";
+        byte[] tmp8B = new byte[8];
+        // read header
+        m_stream.read(m_tmp2B);
+        bankNumber = readUnsignedWord(m_tmp2B);
+        m_stream.read(m_tmp2B);
+        isChipMemory = (readUnsignedWord(m_tmp2B)==0);
+        m_stream.read(m_tmp4B);
+        flags = 0x0f & (m_tmp4B[0] >> 4);
+        m_tmp4B[0] = (byte)( 0x0f & m_tmp4B[0] );
+        bankSize = (int)readUnsignedInt(m_tmp4B) - 8;
+        m_stream.read(tmp8B);
+        bankName = new String(tmp8B);
+        System.err.println(" Bank "+bankNumber+": "+bankName+(isChipMemory?" (chip) ":" ")+bankSize+" bytes");
+        if (bankSize > 0) {
+            byte[] data = new byte[bankSize];
+            m_stream.read(data);
+        }
+    }
+    
     /**
      * Reads tokens from a line of AMOS BASIC code
      */

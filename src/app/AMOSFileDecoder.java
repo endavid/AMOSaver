@@ -88,6 +88,7 @@ public class AMOSFileDecoder {
                             case MEMORYBANK:
                             {
                                 System.out.println("MemoryBank");
+                                fileDecoder.readMemoryBank();
                                 break;
                             }
                         }

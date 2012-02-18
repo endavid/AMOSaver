@@ -35,7 +35,8 @@ public class PlanarImage {
                         int bitPixel = (b>>p) & 0x01;
                         bitPixel = bitPixel << bit ;
                         int x = 8 * i + (7-p) ;
-                        raster.setSample(x,j,0, bitPixel|raster.getSample(x,j,0));
+                        if (bit > 0) bitPixel |= raster.getSample(x,j,0);
+                        raster.setSample(x,j,0, bitPixel);
                     }
                 }
             }
