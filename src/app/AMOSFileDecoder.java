@@ -1,6 +1,11 @@
 package app ;
 
 import java.io.File ;
+import java.awt.image.BufferedImage;
+import java.util.List;
+import java.util.ArrayList;
+import java.util.Iterator;
+import javax.imageio.ImageIO;
 import amos.io.* ;
 
 public class AMOSFileDecoder {
@@ -29,7 +34,16 @@ public class AMOSFileDecoder {
                         case SPRITEBANK:
                         {
                             System.out.println("SpriteBank");
-                            fileDecoder.readImages();
+                            String format = "png";
+
+                            List<BufferedImage> imgList = fileDecoder.readImages();
+                            int count = 0;
+                            for (Iterator<BufferedImage> it = imgList.iterator(); it.hasNext(); ) {
+                                count++;
+                                BufferedImage img = it.next();
+                                File imgfile = new File(String.format("Sprite_%03d.png",count));
+                                ImageIO.write(img, format, imgfile);
+                            }
                             break;
                         }
                         case ICONBANK:

@@ -5,7 +5,12 @@ import java.io.FileInputStream ;
 import java.io.FileNotFoundException ;
 import java.util.Map;
 import java.util.HashMap;
+import java.util.List;
+import java.util.ArrayList;
+import java.awt.image.BufferedImage;
+import java.awt.image.IndexColorModel;
 
+import amos.img.*;
 
 /**
  * @see http://www.exotica.org.uk/wiki/AMOS_file_formats
@@ -115,16 +120,17 @@ public class AMOSFileInputStream
     /**
      * Reads Sprites or Icons
      */
-    public void readImages() throws java.io.IOException, java.io.StreamCorruptedException
+    public List<BufferedImage> readImages() throws java.io.IOException, java.io.StreamCorruptedException
     {
         m_stream.read(m_tmp2B);
         int numImages = readUnsignedWord(m_tmp2B);
+        List<BufferedImage> imgList = new ArrayList<BufferedImage>(numImages);
         System.out.println("Num images: "+numImages);
         for (int i=0;i<numImages;++i) {
             int width = 0, height = 0, depth = 0;
             int hotspotX = 0, hotspotY = 0;
             int dataSize = 0;
-            byte[] imageData ;
+            byte[] imageData = null ;
             
             m_stream.read(m_tmp2B);
             width = readUnsignedWord(m_tmp2B);
@@ -132,7 +138,7 @@ public class AMOSFileInputStream
             height = readUnsignedWord(m_tmp2B);
             m_stream.read(m_tmp2B);
             depth = readUnsignedWord(m_tmp2B);
-            if (depth<1 || depth>5) {
+            if (depth<1 || depth>6) {
                 throw( new java.io.StreamCorruptedException("Incompatible image depth("+depth+")!") );
             }
             m_stream.read(m_tmp2B);
@@ -140,16 +146,30 @@ public class AMOSFileInputStream
             m_stream.read(m_tmp2B);
             hotspotY = readUnsignedWord(m_tmp2B);
             dataSize = 2 * width * height * depth ;
-            System.out.println("img("+i+")="+width+"x"+height+"x"+depth+", ("+hotspotX+", "+hotspotY+")");
+            System.out.println("img("+i+")="+(16*width)+"x"+height+"x"+depth+", ("+hotspotX+", "+hotspotY+")");
             if ( dataSize > 0 ) {
                 imageData = new byte[dataSize];
                 m_stream.read(imageData);
                 // now convert planar data... 
             }
+            // construct image 
+            // -- width is in 16-bit words
+            PlanarImage img = new PlanarImage(width*16, height, depth, imageData);
+            // add to list
+            imgList.add(img.GetAsBufferedImage());
         }
         // after all the images comes the color palette
         byte[] paletteData = new byte[64];
         m_stream.read(paletteData);
+        // decode color palette
+        IndexColorModel palette = PlanarImage.decodeColorPalette(paletteData);
+        // replace color palettes
+        for (int i=0;i<imgList.size();++i) {
+            BufferedImage image = imgList.get(i);
+            imgList.set(i, new BufferedImage(palette,image.getRaster(), false, null));
+        }
+        
+        return imgList ;
     }
     
     /**

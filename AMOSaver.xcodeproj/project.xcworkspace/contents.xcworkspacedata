@@ -8,6 +8,13 @@
          location = "group:amos"
          name = "amos">
          <Group
+            location = "group:img"
+            name = "img">
+            <FileRef
+               location = "group:PlanarImage.java">
+            </FileRef>
+         </Group>
+         <Group
             location = "group:io"
             name = "io">
             <FileRef
