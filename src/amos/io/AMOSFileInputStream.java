@@ -15,6 +15,7 @@ import amos.img.*;
 /**
  * @see http://www.exotica.org.uk/wiki/AMOS_file_formats
  * @see http://www.amigacoding.com/index.php/AMOS:Picture_Bank_format
+ * @see http://www.amigacoding.com/index.php/AMOS:Extensions
  */
 public class AMOSFileInputStream
 {
@@ -658,7 +659,17 @@ public class AMOSFileInputStream
         m_extensions.put(0x010074, "Boom");
         m_extensions.put(0x0100f8, "Sam Play ");
         m_extensions.put(0x010144, "Play ");
-        m_extensions.put(0x020056, "Unpack ");        
+        m_extensions.put(0x020056, "Unpack ");
+        _initCraftTokenMap();
+    }
+    
+    /**
+     * Extensions 18, 19: Craft, MUSICraft
+     */
+    private void _initCraftTokenMap()
+    {
+        m_extensions.put(0x130028, "St Play ");   
+        m_extensions.put(0x130030, "St Stop"); 
     }
     
 }
