@@ -26,6 +26,7 @@ Features
 Build
 ------
 Use <code>ant</code> to build the project.
+
 * Go to the project folder.
 * Type <code>ant</code>, and it will create a <code>.jar</code> file inside <code>dist</code> folder.
 * Alternatively, if you have a Mac, open the XCode project file and build using XCode.
@@ -34,8 +35,8 @@ Usage
 ------
 
 * Run it from the command line using Java VM.
-<pre><code>
-java -jar AMOSFileDecoder [options] SOURCEFILE.AMOS
+
+<pre><code>java -jar AMOSFileDecoder [options] SOURCEFILE.AMOS
 </code></pre>
 
 * Options:
@@ -46,23 +47,21 @@ java -jar AMOSFileDecoder [options] SOURCEFILE.AMOS
 
 * Examples:
  * This example will decode the input file and output as a plain AMOS file (I call this file "pamos").
-<pre><code>
-java -jar AMOSFileDecoder --sourceonly MYPROGRAM.AMOS &gt;myprogram.pamos
+<pre><code>java -jar AMOSFileDecoder --sourceonly MYPROGRAM.AMOS &gt;myprogram.pamos
 </code></pre>
  * This example will create image files inside the specified folder, output the source code to the pamos file, and output information to the console such as the size of each sprite or the memory banks that the AMOS file contains.
-<pre><code>
-java -jar AMOSFileDecoder -v --imagefolder ~/Pictures/ MYPROGRAM.AMOS &gt;myprogram.pamos
-**OUTPUT Example**_
-Decoding 6 banks...
+<pre><code>java -jar AMOSFileDecoder -v --imagefolder ~/Pictures/ MYPROGRAM.AMOS &gt;myprogram.pamos
+**[OUTPUT Example]**
+_Decoding 6 banks..._
  Bank 9: Pac.Pic. 27826 bytes
  Bank 0: Samples  (chip) 30088 bytes
  Bank 7: Pac.Pic. 5246 bytes
  Bank 3: Music    (chip) 45124 bytes
  Bank 5: Samples  (chip) 60900 bytes
-... reading 8 images
+_... reading 8 images_
 img(0)=16x10x5, (0, 0)
 img(1)=16x10x5, (0, 0)
-..._
+...
 </code></pre>
 
 To do
