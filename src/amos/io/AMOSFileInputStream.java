@@ -420,7 +420,7 @@ public class AMOSFileInputStream
                 }
                 case 0x02D0: // ELSE
                 {
-                    line = line + "Else ";
+                    line = line + " Else ";
                     m_stream.read(m_tmp2B); // unknown purpose
                     readWords += 1;
                     break;
@@ -514,13 +514,24 @@ public class AMOSFileInputStream
         return false ;
     }
 
+    /**
+     * bits 31-8: mantissa (24 bits)
+     * bit 7: sign bit. Positive if 0, negative if 1
+     * bits 6-0: exponent
+     * FP result =[(-1)^SIGN] * [2^(EXP - 0x40)] * [MANTISSA / 0x1000000]
+     */
     public static float readFloat(byte[] bigEndian)
     {
-        int value = ((0x000000ff & (int)bigEndian[0]) << 24) |
-            ((0x000000ff & (int)bigEndian[1]) << 16) |
-            ((0x000000ff & (int)bigEndian[2]) <<  8) |
-            ((0x000000ff & (int)bigEndian[3]) ) ;
-        return Float.intBitsToFloat(value) ;
+        int mantissa =
+            ((0x000000ff & (int)bigEndian[0]) << 16) |
+            ((0x000000ff & (int)bigEndian[1]) << 8) |
+            ((0x000000ff & (int)bigEndian[2])) ;
+        int exponent = (int)(0x7f & bigEndian[3]) - 0x040 ;
+        int sign = 0x01 & (int)(bigEndian[3]>>7) ;
+        float f = ((float)mantissa/(float)0x01000000) 
+            * (float)Math.pow(2.0, (double)exponent);
+        //System.err.println("mantissa: "+mantissa+", exp: "+exponent);
+        return (sign==1)?-f:f;
     }
     public static int readSignedWord(byte[] bigEndianSigned)
     {
@@ -585,16 +596,30 @@ public class AMOSFileInputStream
         m_tokenMap.put(0x0444,"Inc "); 
         m_tokenMap.put(0x044e,"Dec "); 
         m_tokenMap.put(0x0458,"Add "); 
-        m_tokenMap.put(0x0476,"Print "); 
+        m_tokenMap.put(0x0476,"Print ");
+        m_tokenMap.put(0x04d0,"Input ");
+        m_tokenMap.put(0x057c,"Upper$");
+        m_tokenMap.put(0x0598,"Str$");
+        m_tokenMap.put(0x0640,"Dim ");
         m_tokenMap.put(0x064A,"REM "); // REM
         m_tokenMap.put(0x0652,"\'"); // REM2
         m_tokenMap.put(0x0686,"Rnd");
+        m_tokenMap.put(0x06d6,"Pi#");
+        m_tokenMap.put(0x0702,"Sin");
+        m_tokenMap.put(0x070c,"Cos");
         m_tokenMap.put(0x09ea,"Screen Open ");
+        m_tokenMap.put(0x0a04,"Screen Close "); 
+        m_tokenMap.put(0x0a18,"Screen Display "); 
         m_tokenMap.put(0x0b16,"View"); 
         m_tokenMap.put(0x0bb8,"Cls "); 
+        m_tokenMap.put(0x0c6e,"Screen ");
+        m_tokenMap.put(0x0c84,"Hires");
         m_tokenMap.put(0x0c90,"Lowres");
+        m_tokenMap.put(0x0cca,"Wait Vbl");
         m_tokenMap.put(0x0d1c,"Colour "); 
         m_tokenMap.put(0x0d34,"Flash Off"); 
+        m_tokenMap.put(0x0d52,"Shift Off");
+        m_tokenMap.put(0x0d62,"Shift Up ");
         m_tokenMap.put(0x0d90,"Set Rainbow ");
         m_tokenMap.put(0x0dd4,"Rainbow Del "); 
         m_tokenMap.put(0x0ddc,"Rainbow "); 
@@ -604,6 +629,7 @@ public class AMOSFileInputStream
         m_tokenMap.put(0x0ed8,"Box "); 
         m_tokenMap.put(0x1044,"Ink "); 
         m_tokenMap.put(0x11f8,"Joy"); 
+        m_tokenMap.put(0x1aa8,"Bob Off"); 
         m_tokenMap.put(0x1202,"Jup"); 
         m_tokenMap.put(0x120c,"Jdown"); 
         m_tokenMap.put(0x1218,"Jleft"); 
@@ -611,13 +637,22 @@ public class AMOSFileInputStream
         m_tokenMap.put(0x1232,"Fire"); 
         m_tokenMap.put(0x1290,"Wait Key"); 
         m_tokenMap.put(0x129e,"Wait "); 
-        m_tokenMap.put(0x13e8,"Centre "); 
+        m_tokenMap.put(0x12ce,"Timer"); 
+        m_tokenMap.put(0x12f4,"Wind Open "); 
+        m_tokenMap.put(0x131a,"Wind Close"); 
+        m_tokenMap.put(0x1351,"Window "); 
+        m_tokenMap.put(0x135e,"Window "); 
         m_tokenMap.put(0x1378,"Locate "); 
         m_tokenMap.put(0x1392,"Home"); 
         m_tokenMap.put(0x13d2,"Pen "); 
         m_tokenMap.put(0x13dc,"Paper "); 
+        m_tokenMap.put(0x13e8,"Centre "); 
         m_tokenMap.put(0x1446,"Curs Off"); 
+        m_tokenMap.put(0x14b2,"Shade On"); 
+        m_tokenMap.put(0x1528,"Cdown"); 
+        m_tokenMap.put(0x1540,"Cright"); 
         m_tokenMap.put(0x175A,"Dir$"); 
+        m_tokenMap.put(0x184e,"Load ");
         m_tokenMap.put(0x185A,"Load ");
         m_tokenMap.put(0x19b0,"Sprite Off ");
         m_tokenMap.put(0x1a26,"Spritebob Col");
@@ -626,6 +661,7 @@ public class AMOSFileInputStream
         m_tokenMap.put(0x1b14,"Bobsprite Col");
         m_tokenMap.put(0x1b36,"Bob Col");
         m_tokenMap.put(0x1b46,"Bob Col");
+        m_tokenMap.put(0x1b52,"Col");
         m_tokenMap.put(0x1b9e,"Bob ");
         m_tokenMap.put(0x1bae,"Get Sprite Palette"); 
         m_tokenMap.put(0x1bd0,"Get Sprite "); 
@@ -642,6 +678,7 @@ public class AMOSFileInputStream
         m_tokenMap.put(0x1fea,"Amal Freeze "); 
         m_tokenMap.put(0x1ffc,"Amal Freeze "); 
         m_tokenMap.put(0x2012,"Amal "); 
+        m_tokenMap.put(0x2bae,"Get Bob Palette"); 
         m_tokenMap.put(0xff4c," or "); 
         m_tokenMap.put(0xff58," and ");
         m_tokenMap.put(0xff66,"<>");
@@ -655,14 +692,25 @@ public class AMOSFileInputStream
         m_tokenMap.put(0xffca,"-");
         m_tokenMap.put(0xffe2,"*");
         m_tokenMap.put(0xffec,"/");
+        m_tokenMap.put(0xfff6,"^");        
         // extensions [ext_number,offset]
-        m_extensions.put(0x010074, "Boom");
-        m_extensions.put(0x0100f8, "Sam Play ");
-        m_extensions.put(0x010144, "Play ");
-        m_extensions.put(0x020056, "Unpack ");
+        _initMusicTokenMap();
         _initCraftTokenMap();
+        m_extensions.put(0x020056, "Unpack ");
     }
     
+    /**
+     * Extension 1: Music
+     */
+    private void _initMusicTokenMap()
+    {
+        m_extensions.put(0x01002c, "Music Off");
+        m_extensions.put(0x010058, "Music ");
+        m_extensions.put(0x010074, "Boom");
+        m_extensions.put(0x0100f8, "Sam Play ");
+        m_extensions.put(0x010144, "Play ");    
+        m_extensions.put(0x010196, "Mvolume ");
+   }
     /**
      * Extensions 18, 19: Craft, MUSICraft
      */
