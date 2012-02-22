@@ -111,14 +111,11 @@ public class AMOSFileInputStream
     {
         m_stream.read(m_tmp4B);
         String text = new String(m_tmp4B);
-        if (text.equals("AmBk")) {
-            return AMOSBankType.MEMORYBANK;
-        } else if (text.equals("AmSp")) {
-            return AMOSBankType.SPRITEBANK;
-        } else if (text.equals("AmIc")) {
-            return AMOSBankType.ICONBANK;
+        AMOSBankType bankType = AMOSBankType.GetAMOSBankTypeById(text);
+        if (bankType==AMOSBankType.UNKNOWN) {
+            throw( new java.io.StreamCorruptedException("Unknown memory bank!") ); 
         }
-        throw( new java.io.StreamCorruptedException("Unknown memory bank!") ); 
+        return bankType;
     }
     
     /**

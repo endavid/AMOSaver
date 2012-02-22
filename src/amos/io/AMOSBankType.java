@@ -1,5 +1,26 @@
 package amos.io;
 
 public enum AMOSBankType {
-    SPRITEBANK, ICONBANK, MEMORYBANK
+    UNKNOWN(""),
+    SPRITEBANK("AmSp"), 
+    ICONBANK("AmIc"),
+    MEMORYBANK("AmBk"),
+    // The definitions below are actually types of Memory Banks
+    PACKED_PICTURE("Pac.Pic."),
+    TRACKER("Tracker"),
+    SAMPLES("Samples");
+
+    private final String _idString;
+    
+    AMOSBankType(String idString) {
+        this._idString = idString;
+    }
+
+    public static AMOSBankType GetAMOSBankTypeById(String idString) {
+        for (AMOSBankType bankType : AMOSBankType.values()) {
+            if (idString.equals(bankType._idString)) return bankType;
+        }
+        return UNKNOWN;
+    }  
+
 }
