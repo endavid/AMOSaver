@@ -3408,7 +3408,7 @@
 				</dict>
 			</array>
 		</dict>
-		<real>351886130.04342598</real>
+		<real>351886842.18010098</real>
 		<string>{3270, 2195}</string>
 		<string>{4480, 0}</string>
 		<string>main(String args[])</string>
@@ -3739,10 +3739,10 @@
 				</dict>
 			</array>
 		</dict>
-		<real>351886130.04321003</real>
-		<string>{23246, 1972}</string>
-		<string>{24142, 0}</string>
-		<string>read1BAsUInt()</string>
+		<real>351886842.17988801</real>
+		<string>{22810, 1732}</string>
+		<string>{23167, 0}</string>
+		<string>isValidHeader(String header)</string>
 		<dict>
 			<key>$class</key>
 			<dict>
@@ -6381,9 +6381,9 @@
 				</dict>
 			</array>
 		</dict>
-		<real>351886130.039662</real>
-		<string>{23246, 1972}</string>
-		<string>{24142, 0}</string>
+		<real>351886842.17000198</real>
+		<string>{22810, 1732}</string>
+		<string>{23167, 0}</string>
 		<dict>
 			<key>$class</key>
 			<dict>
@@ -6529,7 +6529,7 @@
 				</dict>
 			</array>
 		</dict>
-		<real>351886087.81972402</real>
+		<real>351886837.27684897</real>
 		<string>{739, 1775}</string>
 		<string>{728, 0}</string>
 		<dict>

@@ -248,8 +248,8 @@ public class AMOSFileInputStream
         // Screen header
         // --------------------------------------------
         m_stream.read(m_tmp4B); // fixed ID
-        width = read2BAsUInt(); // width in pixels
-        height = read2BAsUInt(); // height in pixels
+        width = _read2BAsUInt(); // width in pixels
+        height = _read2BAsUInt(); // height in pixels
         m_stream.read(m_tmp2B); // hardware top-left X
         m_stream.read(m_tmp2B); // hardware top-left Y
         m_stream.read(m_tmp2B); // hardware screen width
@@ -259,22 +259,22 @@ public class AMOSFileInputStream
         // Value of the Amiga BPLCON0 register, which details the hardware screen mode such as HAM, hires or interlaced
         m_stream.read(m_tmp2B);
         // Number of colours on screen. 
-        numColors = read2BAsUInt(); // 2, 4, 8, 16, 32, 64 (EHB) or 4096 (HAM)
-        numBitplanes = read2BAsUInt(); // 1..6
+        numColors = _read2BAsUInt(); // 2, 4, 8, 16, 32, 64 (EHB) or 4096 (HAM)
+        numBitplanes = _read2BAsUInt(); // 1..6
         // 32 2-byte palette entries in the Amiga COLORxx register format.
         byte[] paletteData = new byte[64];
         m_stream.read(paletteData);
         // Picture header
         // --------------------------------------------
-        read4BAsInt(); // fixed ID
-        read2BAsUInt(); // X coordinate offset in bytes of the picture within the screen itself.
-        read2BAsUInt(); // Y coordinate offset in lines (vertical pixels) of the picture within the screen itself.
-        read2BAsUInt(); // picture width in bytes.
-        read2BAsUInt(); // picture height in "line lumps"
-        read2BAsUInt(); // number of lines in a "line lump"
-        read2BAsUInt(); // number of bitplanes in the picture
-        read4BAsUInt(); // offset to the RLEDATA stream, relative to the picture header ID's offset.
-        read4BAsUInt(); // offset to the POINTS stream, relative to the picture header ID's offset.
+        _read4BAsInt(); // fixed ID
+        _read2BAsUInt(); // X coordinate offset in bytes of the picture within the screen itself.
+        _read2BAsUInt(); // Y coordinate offset in lines (vertical pixels) of the picture within the screen itself.
+        _read2BAsUInt(); // picture width in bytes.
+        _read2BAsUInt(); // picture height in "line lumps"
+        _read2BAsUInt(); // number of lines in a "line lump"
+        _read2BAsUInt(); // number of bitplanes in the picture
+        _read4BAsUInt(); // offset to the RLEDATA stream, relative to the picture header ID's offset.
+        _read4BAsUInt(); // offset to the POINTS stream, relative to the picture header ID's offset.
         
         // @todo Decompress picture data
         // ---------------------------------------------
@@ -406,7 +406,7 @@ public class AMOSFileInputStream
                 case 0x002E: // String with single quotes
                 {
                     // length of the string 
-                    int strlength = read2BAsUInt();
+                    int strlength = _read2BAsUInt();
                     if ( (strlength%2)==1 ) strlength += 1; // round up to words
                     byte[] str = new byte[strlength];
                     m_stream.read(str);
@@ -416,38 +416,38 @@ public class AMOSFileInputStream
                 }
                 case 0x001E: // Binary integer value
                 {
-                    int value = read4BAsInt();
+                    int value = _read4BAsInt();
                     readWords += 2;
                     line = line + "%"+Integer.toBinaryString(value) ;
                     break;
                 }
                 case 0x0036: // Hexadecimal integer value
                 {
-                    int value = read4BAsInt();
+                    int value = _read4BAsInt();
                     readWords += 2;
                     line = line + "$"+Integer.toHexString(value) ;
                     break;
                 }
                 case 0x003E: // Decimal integer value
                 {
-                    int value = read4BAsInt();
+                    int value = _read4BAsInt();
                     readWords += 2;
                     line = line +Integer.toString(value) ;
                     break;
                 }
                 case 0x0046: // Float value
                 {
-                    float value = read4BAsFloat();
+                    float value = _read4BAsFloat();
                     readWords += 2;
                     line = line + Float.toString(value) ;
                     break;
                 }
                 case 0x004E: // Extension command
                 {
-                    int extNumber = read1BAsUInt();
+                    int extNumber = _read1BAsUInt();
                     m_stream.read(m_tmp1B); // unused
                     // signed 16-bit offset into extension's token table
-                    int offset = read2BAsInt();
+                    int offset = _read2BAsInt();
                     readWords += 2;
                     String tokenStr = m_extensions.get((extNumber<<16)|offset);
                     if ( tokenStr != null ) {
@@ -592,27 +592,27 @@ public class AMOSFileInputStream
     
     // functions to read values from current stream
     // -------------------------------------------------------
-    private float read4BAsFloat() throws java.io.IOException {
+    private float _read4BAsFloat() throws java.io.IOException {
         m_stream.read(m_tmp4B);
         return readFloat(m_tmp4B);
     }
-    private int read4BAsInt() throws java.io.IOException {
+    private int _read4BAsInt() throws java.io.IOException {
         m_stream.read(m_tmp4B);
         return readSignedInt(m_tmp4B);
     }
-    private long read4BAsUInt() throws java.io.IOException {
+    private long _read4BAsUInt() throws java.io.IOException {
         m_stream.read(m_tmp4B);
         return readUnsignedInt(m_tmp4B);
     }
-    private int read2BAsInt() throws java.io.IOException {
+    private int _read2BAsInt() throws java.io.IOException {
         m_stream.read(m_tmp2B);
         return readSignedWord(m_tmp2B);
     }
-    private int read2BAsUInt() throws java.io.IOException {
+    private int _read2BAsUInt() throws java.io.IOException {
         m_stream.read(m_tmp2B);
         return readUnsignedWord(m_tmp2B);
     }
-    private int read1BAsUInt() throws java.io.IOException {
+    private int _read1BAsUInt() throws java.io.IOException {
         m_stream.read(m_tmp1B);
         return readUnsignedByte(m_tmp1B);
     }
