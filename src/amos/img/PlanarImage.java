@@ -4,15 +4,22 @@ import java.awt.image.BufferedImage;
 import java.awt.image.WritableRaster;
 import java.awt.image.IndexColorModel;
 
+/**
+ * This class handles Planar Images, used mostly in Amiga computers
+ */
 public class PlanarImage {
 
     BufferedImage m_img;
     int m_width;
     int m_height;
     int m_numBitplanes;
-    
+
     public PlanarImage(int width, int height, int depth, byte[] planarData) {
-        m_img = new BufferedImage(width, height, BufferedImage.TYPE_BYTE_INDEXED, createGrayGradientPalette());
+        this(width, height, depth, planarData, createGrayGradientPalette() );
+    }
+    
+    public PlanarImage(int width, int height, int depth, byte[] planarData, IndexColorModel colorModel) {
+        m_img = new BufferedImage(width, height, BufferedImage.TYPE_BYTE_INDEXED, colorModel);
         m_width=width;
         m_height=height;
         m_numBitplanes = depth;

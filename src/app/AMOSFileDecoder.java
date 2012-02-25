@@ -63,6 +63,9 @@ public class AMOSFileDecoder {
                     // process banks
                     for(int i=0;i<numBanks;i++) {
                         AMOSBankType bankType = fileDecoder.readBankType();
+                        if (bankType == AMOSBankType.MEMORYBANK) { // subtype
+                            bankType = fileDecoder.readMemoryBankType();
+                        }
                         switch(bankType) {
                             case SPRITEBANK:
                             {
@@ -90,9 +93,18 @@ public class AMOSFileDecoder {
                                 }
                                 break;
                             }
-                            case MEMORYBANK:
+                            case PACKED_PICTURE:
                             {
-                                fileDecoder.readMemoryBank();
+                                String format = "png";
+                                BufferedImage img = fileDecoder.readPacPic();
+                                File imgFile = new File(dataFolder+String.format("PacPic_%02d.png",fileDecoder.getCurrentBankNumber()));
+                                ImageIO.write(img, format, imgFile);
+                                break;
+                            }
+                            default:
+                            case MEMORYBANK: // Generic memory bank
+                            {
+                                fileDecoder.readMemoryBankRaw();
                                 break;
                             }
                         }

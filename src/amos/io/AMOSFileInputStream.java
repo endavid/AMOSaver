@@ -36,6 +36,8 @@ public class AMOSFileInputStream
     long    m_sourceSizeBytes ;
     long    m_readBytes ;
     int     m_numBanks ;
+    int     m_currentBankSize;
+    int     m_currentBankNumber;
     byte[]  m_tmp4B = {0,0,0,0};
     byte[]  m_tmp2B = {0,0};
     byte[]  m_tmp1B = {0};
@@ -73,6 +75,8 @@ public class AMOSFileInputStream
         m_sourceSizeBytes = readUnsignedInt(m_tmp4B);
         m_readBytes = 0;
         m_numBanks = 0;
+        m_currentBankSize = 0;
+        m_currentBankNumber = 0;
 
         m_tokenMap = new HashMap<Integer,String>();
         m_extensions = new HashMap<Integer,String>();
@@ -86,6 +90,14 @@ public class AMOSFileInputStream
     public boolean isSourceCodeEnd()
     {
         return ( m_readBytes >= m_sourceSizeBytes );
+    }
+    
+    /**
+     * Just returns the number of the bank currently being processed
+     */
+    public int getCurrentBankNumber()
+    {
+        return m_currentBankNumber;
     }
     
     /**
@@ -177,7 +189,11 @@ public class AMOSFileInputStream
         return imgList ;
     }
     
-    public void readMemoryBank() throws java.io.IOException, java.io.StreamCorruptedException
+    /**
+     * Gets the information about this memory bank.
+     * For unsupported formats, it returns MEMORYBANKS as generic type
+     */
+    public AMOSBankType readMemoryBankType() throws java.io.IOException
     {
         int bankNumber = 0;
         boolean isChipMemory = false;
@@ -199,10 +215,78 @@ public class AMOSFileInputStream
         if (m_isVerbose) {
             System.err.println(" Bank "+bankNumber+": "+bankName+(isChipMemory?" (chip) ":" ")+bankSize+" bytes");
         }
-        if (bankSize > 0) {
-            byte[] data = new byte[bankSize];
-            m_stream.read(data);
+        AMOSBankType bankType = AMOSBankType.GetAMOSBankTypeById(bankName);
+        if (bankType==AMOSBankType.UNKNOWN) {
+            System.err.println("Unknown memory bank: "+bankName);
         }
+        m_currentBankSize = bankSize ;
+        m_currentBankNumber = bankNumber;
+        return bankType;
+    }
+    
+    /**
+     * For unknown bank types, just reads the data as a byte array.
+     */
+    public byte[] readMemoryBankRaw() throws java.io.IOException
+    {
+        if (m_currentBankSize > 0) {
+            byte[] data = new byte[m_currentBankSize];
+            m_stream.read(data);
+            m_currentBankSize = 0;
+            return data;
+        }
+        return null;
+    }
+    
+    /**
+     * Reads a Packed Picture (Pac.Pic.)
+     * @see http://www.exotica.org.uk/wiki/AMOS_Pac.Pic._format
+     */
+    public BufferedImage readPacPic() throws java.io.IOException
+    {
+        int width, height, numColors, numBitplanes;
+        // Screen header
+        // --------------------------------------------
+        m_stream.read(m_tmp4B); // fixed ID
+        width = read2BAsUInt(); // width in pixels
+        height = read2BAsUInt(); // height in pixels
+        m_stream.read(m_tmp2B); // hardware top-left X
+        m_stream.read(m_tmp2B); // hardware top-left Y
+        m_stream.read(m_tmp2B); // hardware screen width
+        m_stream.read(m_tmp2B); // hardware screen height
+        m_stream.read(m_tmp2B); // unknown
+        m_stream.read(m_tmp2B); // unknown
+        // Value of the Amiga BPLCON0 register, which details the hardware screen mode such as HAM, hires or interlaced
+        m_stream.read(m_tmp2B);
+        // Number of colours on screen. 
+        numColors = read2BAsUInt(); // 2, 4, 8, 16, 32, 64 (EHB) or 4096 (HAM)
+        numBitplanes = read2BAsUInt(); // 1..6
+        // 32 2-byte palette entries in the Amiga COLORxx register format.
+        byte[] paletteData = new byte[64];
+        m_stream.read(paletteData);
+        // Picture header
+        // --------------------------------------------
+        read4BAsInt(); // fixed ID
+        read2BAsUInt(); // X coordinate offset in bytes of the picture within the screen itself.
+        read2BAsUInt(); // Y coordinate offset in lines (vertical pixels) of the picture within the screen itself.
+        read2BAsUInt(); // picture width in bytes.
+        read2BAsUInt(); // picture height in "line lumps"
+        read2BAsUInt(); // number of lines in a "line lump"
+        read2BAsUInt(); // number of bitplanes in the picture
+        read4BAsUInt(); // offset to the RLEDATA stream, relative to the picture header ID's offset.
+        read4BAsUInt(); // offset to the POINTS stream, relative to the picture header ID's offset.
+        
+        // @todo Decompress picture data
+        // ---------------------------------------------
+        m_currentBankSize -= 114; // headers
+        byte[] data = readMemoryBankRaw();
+        
+        // Create PlanarImage
+        // ---------------------------------------------
+        IndexColorModel palette = PlanarImage.decodeColorPalette(paletteData);
+        PlanarImage img = new PlanarImage(1,1,1,data,palette);
+
+        return img.GetAsBufferedImage();
     }
     
     /**
@@ -321,8 +405,8 @@ public class AMOSFileInputStream
                 }
                 case 0x002E: // String with single quotes
                 {
-                    m_stream.read(m_tmp2B); // length of the string 
-                    int strlength = readUnsignedWord(m_tmp2B);
+                    // length of the string 
+                    int strlength = read2BAsUInt();
                     if ( (strlength%2)==1 ) strlength += 1; // round up to words
                     byte[] str = new byte[strlength];
                     m_stream.read(str);
@@ -332,43 +416,38 @@ public class AMOSFileInputStream
                 }
                 case 0x001E: // Binary integer value
                 {
-                    m_stream.read(m_tmp4B); // integer 
-                    int value = readSignedInt(m_tmp4B);
+                    int value = read4BAsInt();
                     readWords += 2;
                     line = line + "%"+Integer.toBinaryString(value) ;
                     break;
                 }
                 case 0x0036: // Hexadecimal integer value
                 {
-                    m_stream.read(m_tmp4B); // integer 
-                    int value = readSignedInt(m_tmp4B);
+                    int value = read4BAsInt();
                     readWords += 2;
                     line = line + "$"+Integer.toHexString(value) ;
                     break;
                 }
                 case 0x003E: // Decimal integer value
                 {
-                    m_stream.read(m_tmp4B); // integer 
-                    int value = readSignedInt(m_tmp4B);
+                    int value = read4BAsInt();
                     readWords += 2;
                     line = line +Integer.toString(value) ;
                     break;
                 }
                 case 0x0046: // Float value
                 {
-                    m_stream.read(m_tmp4B); // float 
-                    float value = readFloat(m_tmp4B);
+                    float value = read4BAsFloat();
                     readWords += 2;
                     line = line + Float.toString(value) ;
                     break;
                 }
                 case 0x004E: // Extension command
                 {
-                    m_stream.read(m_tmp1B); // integer 
-                    int extNumber = readUnsignedByte(m_tmp1B);
+                    int extNumber = read1BAsUInt();
                     m_stream.read(m_tmp1B); // unused
-                    m_stream.read(m_tmp2B); // signed 16-bit offset into extension's token table
-                    int offset = readSignedWord(m_tmp2B);
+                    // signed 16-bit offset into extension's token table
+                    int offset = read2BAsInt();
                     readWords += 2;
                     String tokenStr = m_extensions.get((extNumber<<16)|offset);
                     if ( tokenStr != null ) {
@@ -510,7 +589,34 @@ public class AMOSFileInputStream
         }
         return false ;
     }
-
+    
+    // functions to read values from current stream
+    // -------------------------------------------------------
+    private float read4BAsFloat() throws java.io.IOException {
+        m_stream.read(m_tmp4B);
+        return readFloat(m_tmp4B);
+    }
+    private int read4BAsInt() throws java.io.IOException {
+        m_stream.read(m_tmp4B);
+        return readSignedInt(m_tmp4B);
+    }
+    private long read4BAsUInt() throws java.io.IOException {
+        m_stream.read(m_tmp4B);
+        return readUnsignedInt(m_tmp4B);
+    }
+    private int read2BAsInt() throws java.io.IOException {
+        m_stream.read(m_tmp2B);
+        return readSignedWord(m_tmp2B);
+    }
+    private int read2BAsUInt() throws java.io.IOException {
+        m_stream.read(m_tmp2B);
+        return readUnsignedWord(m_tmp2B);
+    }
+    private int read1BAsUInt() throws java.io.IOException {
+        m_stream.read(m_tmp1B);
+        return readUnsignedByte(m_tmp1B);
+    }
+    
     /**
      * bits 31-8: mantissa (24 bits)
      * bit 7: sign bit. Positive if 0, negative if 1

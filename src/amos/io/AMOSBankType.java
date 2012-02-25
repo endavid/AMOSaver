@@ -5,10 +5,10 @@ public enum AMOSBankType {
     SPRITEBANK("AmSp"), 
     ICONBANK("AmIc"),
     MEMORYBANK("AmBk"),
-    // The definitions below are actually types of Memory Banks
+    // The definitions below are actually subtypes of MEMORYBANK
     PACKED_PICTURE("Pac.Pic."),
-    TRACKER("Tracker"),
-    SAMPLES("Samples");
+    TRACKER("Tracker "),
+    SAMPLES("Samples ");
 
     private final String _idString;
     
