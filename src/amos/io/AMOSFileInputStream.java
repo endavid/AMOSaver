@@ -1,3 +1,11 @@
+// Copyright (C) 2012 David Gavilan Ruiz
+// 
+// Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+// 
+// The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+//
 package amos.io ;
 
 import java.io.File ;
@@ -321,8 +329,7 @@ public class AMOSFileInputStream
                 case 0x0006: // Variable reference
                 {
                     m_stream.read(m_tmp2B); // unknown purpose 
-                    m_stream.read(m_tmp1B); // string size 
-                    int strlength = readUnsignedByte(m_tmp1B);
+                    int strlength = _read1BAsUInt(); // string size
                     if ( (strlength%2)==1 ) strlength += 1; // round up to words
                     m_stream.read(m_tmp1B); // flag
                     int flag = readUnsignedByte(m_tmp1B);
@@ -343,8 +350,7 @@ public class AMOSFileInputStream
                 case 0x000C: // Label
                 {
                     m_stream.read(m_tmp2B); // unknown purpose 
-                    m_stream.read(m_tmp1B); // string size 
-                    int strlength = readUnsignedByte(m_tmp1B);
+                    int strlength = _read1BAsUInt(); // string size
                     if ( (strlength%2)==1 ) strlength += 1; // round up to words
                     m_stream.read(m_tmp1B); // flag
                     int flag = readUnsignedByte(m_tmp1B);
@@ -357,8 +363,7 @@ public class AMOSFileInputStream
                 case 0x0012: // Procedure call reference
                 {
                     m_stream.read(m_tmp2B); // unknown purpose 
-                    m_stream.read(m_tmp1B); // string size 
-                    int strlength = readUnsignedByte(m_tmp1B);
+                    int strlength = _read1BAsUInt(); // string size
                     if ( (strlength%2)==1 ) strlength += 1; // round up to words
                     m_stream.read(m_tmp1B); // flag
                     int flag = readUnsignedByte(m_tmp1B);
@@ -376,8 +381,7 @@ public class AMOSFileInputStream
                 case 0x0018: // Label reference
                 {
                     m_stream.read(m_tmp2B); // unknown purpose 
-                    m_stream.read(m_tmp1B); // string size 
-                    int strlength = readUnsignedByte(m_tmp1B);
+                    int strlength = _read1BAsUInt(); // string size
                     if ( (strlength%2)==1 ) strlength += 1; // round up to words
                     m_stream.read(m_tmp1B); // flag
                     int flag = readUnsignedByte(m_tmp1B);
@@ -394,8 +398,8 @@ public class AMOSFileInputStream
                 }
                 case 0x0026: // String with double quotes
                 {
-                    m_stream.read(m_tmp2B); // length of the string 
-                    int strlength = readUnsignedWord(m_tmp2B);
+                    // length of the string 
+                    int strlength = _read2BAsUInt();
                     if ( (strlength%2)==1 ) strlength += 1; // round up to words
                     byte[] str = new byte[strlength];
                     m_stream.read(str);

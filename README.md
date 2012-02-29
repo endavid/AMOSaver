@@ -78,6 +78,11 @@ About the name: AMOSaver
  * _vAMOS a ver_: in Spanish, "let's see"... I was not sure what this project would turn into, so for now, let's just see...
 
 
+License
+--------
+The source code of this project is distributed under the MIT License. Please feel free to use it.
+
+
 To do
 -----
 * These are some of the things I plan to add:
