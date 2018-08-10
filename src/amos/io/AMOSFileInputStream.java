@@ -75,7 +75,7 @@ public class AMOSFileInputStream
         }
         
         if (!isValidHeader(headerString)) {
-           throw( new amos.io.UnsupportedFormat(headerString) );
+            throw( new amos.io.UnsupportedFormat(headerString) );
         }
         
         m_stream.read(m_tmp4B); // big endian unsigned
@@ -690,6 +690,7 @@ public class AMOSFileInputStream
         m_tokenMap.put(0x00f2,"Inkey$");  
         m_tokenMap.put(0x012c,"Double Buffer"); 
         m_tokenMap.put(0x0140,"Start"); 
+        m_tokenMap.put(0x015a,"Doke ");
         m_tokenMap.put(0x0246,"Next "); 
         m_tokenMap.put(0x025c,"Until "); 
         m_tokenMap.put(0x0274,"Wend"); 
@@ -698,9 +699,13 @@ public class AMOSFileInputStream
         m_tokenMap.put(0x02a8,"Goto "); 
         m_tokenMap.put(0x02b2,"Gosub "); 
         m_tokenMap.put(0x02da,"End If"); 
+        m_tokenMap.put(0x02e6,"On Error ");
+        m_tokenMap.put(0x031e,"Resume Label ");
+        m_tokenMap.put(0x0330,"Resume");
         m_tokenMap.put(0x033c,"Pop Proc");
         m_tokenMap.put(0x0356," Step "); 
         m_tokenMap.put(0x0360,"Return"); 
+        m_tokenMap.put(0x0386,"Proc ");
         m_tokenMap.put(0x0390,"End Proc "); 
         m_tokenMap.put(0x03aa,"Global "); 
         m_tokenMap.put(0x03b6,"End "); 
@@ -723,6 +728,7 @@ public class AMOSFileInputStream
         m_tokenMap.put(0x0598,"Str$");
         m_tokenMap.put(0x05a4,"Val");
         m_tokenMap.put(0x05da,"Len");
+        m_tokenMap.put(0x05e4,"Instr");
         m_tokenMap.put(0x0640,"Dim ");
         m_tokenMap.put(0x064A,"REM "); // REM
         m_tokenMap.put(0x0652,"\'"); // REM2
@@ -730,6 +736,7 @@ public class AMOSFileInputStream
         m_tokenMap.put(0x0670,"Edit");
         m_tokenMap.put(0x06a0,"Sgn");
         m_tokenMap.put(0x06aa,"Abs");
+        m_tokenMap.put(0x06b4,"Int");
         m_tokenMap.put(0x06d6,"Pi#");
         m_tokenMap.put(0x0702,"Sin");
         m_tokenMap.put(0x070c,"Cos");
@@ -737,10 +744,16 @@ public class AMOSFileInputStream
         m_tokenMap.put(0x09ea,"Screen Open ");
         m_tokenMap.put(0x0a04,"Screen Close "); 
         m_tokenMap.put(0x0a18,"Screen Display "); 
+        m_tokenMap.put(0x0a36,"Screen Offset ");
         m_tokenMap.put(0x0a88,"Screen To Front ");
-        m_tokenMap.put(0x0ac8,"Screen Show");
+        m_tokenMap.put(0x0a90,"Screen To Back ");
+        m_tokenMap.put(0x0aa6,"Screen To Back ");
         m_tokenMap.put(0x0aae,"Screen Hide");
+        m_tokenMap.put(0x0ac0,"Screen Hide ");
+        m_tokenMap.put(0x0ac8,"Screen Show");
+        m_tokenMap.put(0x0ada,"Screen Show ");
         m_tokenMap.put(0x0b16,"View"); 
+        m_tokenMap.put(0x0b34,"Auto View On ");
         m_tokenMap.put(0x0b90,"Get Palette ");
         m_tokenMap.put(0x0bb8,"Cls "); 
         m_tokenMap.put(0x0bee,"X Hard");
@@ -752,10 +765,14 @@ public class AMOSFileInputStream
         m_tokenMap.put(0x0c84,"Hires");
         m_tokenMap.put(0x0c90,"Lowres");
         m_tokenMap.put(0x0cca,"Wait Vbl");
+        m_tokenMap.put(0x0cfc,"Palette ");
         m_tokenMap.put(0x0d1c,"Colour "); 
+        m_tokenMap.put(0x0d2c,"Colour");
         m_tokenMap.put(0x0d34,"Flash Off"); 
+        m_tokenMap.put(0x0d44,"Flash ");
         m_tokenMap.put(0x0d52,"Shift Off");
         m_tokenMap.put(0x0d62,"Shift Up ");
+        m_tokenMap.put(0x0d78,"Shift Down ");
         m_tokenMap.put(0x0d90,"Set Rainbow ");
         m_tokenMap.put(0x0dd4,"Rainbow Del "); 
         m_tokenMap.put(0x0ddc,"Rainbow "); 
@@ -763,6 +780,7 @@ public class AMOSFileInputStream
         m_tokenMap.put(0x0dfe,"Fade ");
         m_tokenMap.put(0x0e2c,"Autoback ");
         m_tokenMap.put(0x0e3c,"Plot ");
+        m_tokenMap.put(0x0e56,"Point");
         m_tokenMap.put(0x0e74,"Draw ");
         m_tokenMap.put(0x0eac,"Polyline ");
         m_tokenMap.put(0x0ec8,"Bar "); 
@@ -773,8 +791,12 @@ public class AMOSFileInputStream
         m_tokenMap.put(0x1044,"Ink "); 
         m_tokenMap.put(0x1050,"Ink "); 
         m_tokenMap.put(0x1066,"Gr Writing "); 
+        m_tokenMap.put(0x1078,"Clip");
+        m_tokenMap.put(0x1084,"Clip ");
         m_tokenMap.put(0x1146,"Get Block "); 
+        m_tokenMap.put(0x1160,"Get Block ");
         m_tokenMap.put(0x1172,"Put Block "); 
+        m_tokenMap.put(0x1184,"Put Block ");
         m_tokenMap.put(0x11ae,"Del Block"); 
         m_tokenMap.put(0x11d8,"Key State");
         m_tokenMap.put(0x11f8,"Joy"); 
@@ -797,6 +819,7 @@ public class AMOSFileInputStream
         m_tokenMap.put(0x135e,"Window "); 
         m_tokenMap.put(0x1378,"Locate "); 
         m_tokenMap.put(0x1392,"Home"); 
+        m_tokenMap.put(0x13c6,"At");
         m_tokenMap.put(0x13d2,"Pen "); 
         m_tokenMap.put(0x13dc,"Paper "); 
         m_tokenMap.put(0x13e8,"Centre "); 
@@ -812,13 +835,18 @@ public class AMOSFileInputStream
         m_tokenMap.put(0x16e2,"Mouse Zone"); 
         m_tokenMap.put(0x174e,"Exist"); 
         m_tokenMap.put(0x175A,"Dir$"); 
+        m_tokenMap.put(0x17d4,"Load Iff ");
+        m_tokenMap.put(0x17e4,"Load Iff ");
         m_tokenMap.put(0x180c,"Bload "); 
+        m_tokenMap.put(0x181a,"Bsave ");
         m_tokenMap.put(0x184e,"Load ");
         m_tokenMap.put(0x185A,"Load ");
         m_tokenMap.put(0x18bc,"Open In ");
         m_tokenMap.put(0x190c,"Close ");
+        m_tokenMap.put(0x1986,"Set Sprite Buffer ");
         m_tokenMap.put(0x199e,"Sprite Off ");
         m_tokenMap.put(0x19b0,"Sprite Off ");
+        m_tokenMap.put(0x19e6,"Sprite Update On");
         m_tokenMap.put(0x1a26,"Spritebob Col");
         m_tokenMap.put(0x1a94,"Sprite ");
         m_tokenMap.put(0x1ab6,"Bob Off ");
@@ -833,6 +861,7 @@ public class AMOSFileInputStream
         m_tokenMap.put(0x1b9e,"Bob ");
         m_tokenMap.put(0x1bae,"Get Sprite Palette"); 
         m_tokenMap.put(0x1bd0,"Get Sprite "); 
+        m_tokenMap.put(0x1bfc,"Get Bob ");
         m_tokenMap.put(0x1c42,"Del Bob ");
         m_tokenMap.put(0x1cfe,"Paste Bob "); 
         m_tokenMap.put(0x1d12,"Paste Icon "); 
@@ -840,15 +869,18 @@ public class AMOSFileInputStream
         m_tokenMap.put(0x1d38,"Make Mask ");
         m_tokenMap.put(0x1d4e,"No Mask ");
         m_tokenMap.put(0x1d90,"Hot Spot ");
+        m_tokenMap.put(0x1dae,"Priority On");
         m_tokenMap.put(0x1dc0,"Priority Off"); 
         m_tokenMap.put(0x1dd2,"Hide On"); 
         m_tokenMap.put(0x1de0,"Hide"); 
         m_tokenMap.put(0x1dea,"Show On ");
+        m_tokenMap.put(0x1df8,"Show ");
         m_tokenMap.put(0x1e02,"Change Mouse ");
         m_tokenMap.put(0x1e16,"X Mouse"); 
         m_tokenMap.put(0x1e24,"Y Mouse"); 
         m_tokenMap.put(0x1e32,"Mouse Key"); 
         m_tokenMap.put(0x1e42,"Mouse Click"); 
+        m_tokenMap.put(0x1e6e,"Limit Mouse ");
         m_tokenMap.put(0x1f94,"Channel "); 
         m_tokenMap.put(0x1fa2,"Amreg"); 
         m_tokenMap.put(0x1fbc,"Amal On "); 
@@ -859,9 +891,19 @@ public class AMOSFileInputStream
         m_tokenMap.put(0x1ffc,"Amal Freeze "); 
         m_tokenMap.put(0x2012,"Amal "); 
         m_tokenMap.put(0x20f2,"Reserve As Work "); 
+        m_tokenMap.put(0x215e,"Erase");
+        m_tokenMap.put(0x21ca,"Poke ");
+        m_tokenMap.put(0x21d8,"Loke ");
+        m_tokenMap.put(0x21e6,"Peek");
+        m_tokenMap.put(0x21f2,"Deek");
+        m_tokenMap.put(0x21fe,"Leek");
+        m_tokenMap.put(0x2416,"Priority Reverse Off");
         m_tokenMap.put(0x2476,"Hrev");
+        m_tokenMap.put(0x24aa,"Amos To Front");
         m_tokenMap.put(0x24e0,"Amos Lock"); 
         m_tokenMap.put(0x26d8,"Erase All"); 
+        m_tokenMap.put(0x28a0,"Poke$ ");
+        m_tokenMap.put(0x28ae,"Peek$");
         m_tokenMap.put(0x2952,"Assign "); 
         m_tokenMap.put(0x2b3e,"Exec "); 
         m_tokenMap.put(0x2bae,"Get Bob Palette"); 
@@ -901,18 +943,25 @@ public class AMOSFileInputStream
      */
     private void _initMusicTokenMap()
     {
+        m_extensions.put(0x010012, "Vumeter");
         m_extensions.put(0x01002c, "Music Off");
         m_extensions.put(0x01003c, "Music Stop");
         m_extensions.put(0x010058, "Music ");
         m_extensions.put(0x010074, "Boom");
         m_extensions.put(0x01008a, "Sam Bank");
         m_extensions.put(0x0100b4, "Sam Loop Off");
+        m_extensions.put(0x0100ee, "Sam Play");
         m_extensions.put(0x0100f8, "Sam Play ");
         m_extensions.put(0x010144, "Play ");
         m_extensions.put(0x010196, "Mvolume ");
         m_extensions.put(0x0101ca, "Led On");
         m_extensions.put(0x0101d6, "Led Off");
         m_extensions.put(0x010246, "Sam Stop");
+        m_extensions.put(0x01025e, "Track Stop");
+        m_extensions.put(0x01026e, "Track Loop On");
+        m_extensions.put(0x010296, "Track Play");
+        m_extensions.put(0x0102ba, "Track Load");
+        m_extensions.put(0x0102a8, "Track Play");
     }
 
     /**
