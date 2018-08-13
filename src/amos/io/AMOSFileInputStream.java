@@ -30,6 +30,7 @@ public class AMOSFileInputStream
     public static final String[] VALID_HEADERS = {
         // 16-byte header, Tested?, Saved from which AMOS?
         "AMOS Pro101V\0\0\0\0",//	Yes	AMOS Professional
+        "AMOS Pro101V\0\0\0\3",//	Yes	AMOS Professional
         "AMOS Basic V134 ",//	Yes	AMOS Pro, but AMOS 1.3 compatible
         "AMOS Basic V1.3 ",//	Yes	AMOS The Creator v1.3
         "AMOS Basic V1.00",//	Yes	AMOS The Creator v1.0 - v1.2
@@ -73,7 +74,7 @@ public class AMOSFileInputStream
         } catch (java.io.IOException exc) {
             throw( new amos.io.UnsupportedFormat("I/O error") );
         }
-        
+
         if (!isValidHeader(headerString)) {
             throw( new amos.io.UnsupportedFormat(headerString) );
         }
